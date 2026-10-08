@@ -190,6 +190,7 @@ create trigger trg_candidates_updated
 -- Row Level Security
 -- ============================================================================
 alter table public.profiles         enable row level security;
+alter table public.companies        enable row level security;
 alter table public.candidates       enable row level security;
 alter table public.recruiters       enable row level security;
 alter table public.skills           enable row level security;

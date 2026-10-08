@@ -8,10 +8,10 @@ data structures and algorithms** — never by database sorting.
 
 ## ✨ Feature Highlights
 
-| Role | Features |
-|---|---|
+| Role          | Features                                                                                                                                                                                      |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Candidate** | Register/Login · Profile + skills (trie autocomplete) · Résumé upload metadata · Job search · Save jobs · Apply · Top-10 ranked recommendations · Skill-gap analysis · Reverse Resume roadmap |
-| **Recruiter** | Register/Login · Company profile · Post / **edit / delete** weighted-skill jobs · Applicants + status pipeline · Candidate search + skill filter · Top-10 ranked candidates |
+| **Recruiter** | Register/Login · Company profile · Post / **edit / delete** weighted-skill jobs · Applicants + status pipeline · Candidate search + skill filter · Top-10 ranked candidates                   |
 
 Plus: dark/light mode, responsive layout, match-score progress bars, skill-gap visualization,
 live DSA benchmark page.
@@ -30,20 +30,14 @@ live DSA benchmark page.
 ## 🚀 Quick Start (local mode — no cloud needed)
 
 ```bash
-# 1. Backend (port 4000)
-cd talentmatch/server
 npm install
-cp .env.example .env   # defaults are fine for local mode
 npm run seed           # 20 candidates, 6 companies, 20 jobs, 9 applications, 6 saved jobs
-npm run dev            # or: npm run build && npm start
-
-# 2. Frontend (port 3000) — new terminal
-cd talentmatch/web
-npm install
-npm run dev            # dev mode; or: npm run build && npm start
+npm run dev            # API on :4000 and web app on :3000
 ```
 
-Open **http://localhost:3000**. `GET /api/health` reports `authProvider: local`.
+Open **http://localhost:3000**. `GET /health` and `GET /api/health` report backend,
+database, and Supabase status (`local-mode` when running without Supabase credentials).
+Use `npm run build` and `npm test` from the repository root for production builds and tests.
 
 ---
 
@@ -51,11 +45,11 @@ Open **http://localhost:3000**. `GET /api/health` reports `authProvider: local`.
 
 The backend runs in **dual mode**. With Supabase env vars set it upgrades automatically:
 
-| Concern | Local mode (no Supabase) | Supabase mode |
-|---|---|---|
-| Auth | bcrypt + server JWT | **Supabase Auth** (GoTrue), tokens verified via JWKS/introspection |
-| DB | `data/db.json` (JSON index) | Same JSON index **+ write-through to Postgres** |
-| Seeding | `npm run seed` | `npm run seed` **pushes the same data to Supabase** |
+| Concern | Local mode (no Supabase)    | Supabase mode                                                      |
+| ------- | --------------------------- | ------------------------------------------------------------------ |
+| Auth    | bcrypt + server JWT         | **Supabase Auth** (GoTrue), tokens verified via JWKS/introspection |
+| DB      | `data/db.json` (JSON index) | Same JSON index **+ write-through to Postgres**                    |
+| Seeding | `npm run seed`              | `npm run seed` **pushes the same data to Supabase**                |
 
 1. Create a project at [supabase.com](https://supabase.com).
 2. Open **SQL Editor** → paste **`server/supabase/migrations/0001_init.sql`** → Run.
@@ -80,13 +74,13 @@ SUPABASE_SERVICE_ROLE_KEY=<service_role key>   # server-side only — never expo
 
 ### Demo accounts (password `password123`)
 
-| Role | Email | Profile |
-|---|---|---|
-| Candidate | `karthik@example.com` | Python/ML — great for skill-gap + roadmap demo |
-| Candidate | `aarav@example.com` | Full stack |
-| Candidate | `ananya@example.com` | Data scientist (masters) |
-| Recruiter | `hr@nimbussoft.com` | Nimbus Soft — 4 jobs |
-| Recruiter | `talent@vertexanalytics.com` | Vertex Analytics — AI/ML jobs |
+| Role      | Email                        | Profile                                        |
+| --------- | ---------------------------- | ---------------------------------------------- |
+| Candidate | `karthik@example.com`        | Python/ML — great for skill-gap + roadmap demo |
+| Candidate | `aarav@example.com`          | Full stack                                     |
+| Candidate | `ananya@example.com`         | Data scientist (masters)                       |
+| Recruiter | `hr@nimbussoft.com`          | Nimbus Soft — 4 jobs                           |
+| Recruiter | `talent@vertexanalytics.com` | Vertex Analytics — AI/ML jobs                  |
 
 ### Run tests
 
@@ -161,30 +155,30 @@ talentmatch/
 
 ## 🔌 API Reference (summary)
 
-| Method & Path | Auth | Purpose / DSA |
-|---|---|---|
-| `POST /api/auth/register` `POST /api/auth/login` | – | JWT auth, bcrypt |
-| `GET /api/jobs?q=` | – | public list + substring filter |
-| `GET /api/jobs/recommendations?limit=10` | candidate | **MaxHeap top-k** ranked jobs |
-| `GET /api/jobs/ranked?q&sort` | candidate | **quickSort** full ranked list + metrics |
-| `POST /api/jobs` | recruiter | post job (weighted skills) |
-| `GET /api/jobs/:id` | – | job + **graph BFS similar jobs** |
-| `POST /api/jobs/:id/apply` | candidate | application (score snapshot) |
-| `POST /api/jobs/:id/save` · `DELETE …/save` | candidate | save / unsave job |
-| `GET /api/jobs/saved` | candidate | bookmarked jobs |
-| `PUT /api/jobs/:id` · `DELETE /api/jobs/:id` | recruiter | edit / delete own job |
-| `GET /api/jobs/:id/applicants` · `PUT …/:appId` | recruiter | applicants + status pipeline |
-| `GET /api/jobs/:id/candidates` | recruiter | ranked candidates + sort metrics |
-| `GET /api/jobs/:id/skill-gap` | candidate | **skill gap report** |
-| `GET /api/jobs/:id/reverse-resume` | candidate | **reverse resume roadmap** |
-| `GET /api/candidates?q&skill&jobId&sort` | recruiter | candidate search/rank |
-| `GET/PUT /api/candidates/me` | candidate | profile (rebuilds indexes) |
-| `GET /api/autocomplete?kind=skill\|job\|company&q=` | – | **Trie** suggestions + timing |
-| `GET /api/analytics/overview` | – | platform stats |
-| `GET /api/analytics/dsa?n=2000` | – | **live benchmark** all structures |
-| `GET /api/graph` | – | entity graph snapshot (viz) |
-| `POST /api/auth/logout` | – | stateless sign-out (client discards session) |
-| `GET /api/health` | – | `{ status, authProvider: supabase\|local }` |
+| Method & Path                                       | Auth      | Purpose / DSA                                |
+| --------------------------------------------------- | --------- | -------------------------------------------- |
+| `POST /api/auth/register` `POST /api/auth/login`    | –         | JWT auth, bcrypt                             |
+| `GET /api/jobs?q=`                                  | –         | public list + substring filter               |
+| `GET /api/jobs/recommendations?limit=10`            | candidate | **MaxHeap top-k** ranked jobs                |
+| `GET /api/jobs/ranked?q&sort`                       | candidate | **quickSort** full ranked list + metrics     |
+| `POST /api/jobs`                                    | recruiter | post job (weighted skills)                   |
+| `GET /api/jobs/:id`                                 | –         | job + **graph BFS similar jobs**             |
+| `POST /api/jobs/:id/apply`                          | candidate | application (score snapshot)                 |
+| `POST /api/jobs/:id/save` · `DELETE …/save`         | candidate | save / unsave job                            |
+| `GET /api/jobs/saved`                               | candidate | bookmarked jobs                              |
+| `PUT /api/jobs/:id` · `DELETE /api/jobs/:id`        | recruiter | edit / delete own job                        |
+| `GET /api/jobs/:id/applicants` · `PUT …/:appId`     | recruiter | applicants + status pipeline                 |
+| `GET /api/jobs/:id/candidates`                      | recruiter | ranked candidates + sort metrics             |
+| `GET /api/jobs/:id/skill-gap`                       | candidate | **skill gap report**                         |
+| `GET /api/jobs/:id/reverse-resume`                  | candidate | **reverse resume roadmap**                   |
+| `GET /api/candidates?q&skill&jobId&sort`            | recruiter | candidate search/rank                        |
+| `GET/PUT /api/candidates/me`                        | candidate | profile (rebuilds indexes)                   |
+| `GET /api/autocomplete?kind=skill\|job\|company&q=` | –         | **Trie** suggestions + timing                |
+| `GET /api/analytics/overview`                       | –         | platform stats                               |
+| `GET /api/analytics/dsa?n=2000`                     | –         | **live benchmark** all structures            |
+| `GET /api/graph`                                    | –         | entity graph snapshot (viz)                  |
+| `POST /api/auth/logout`                             | –         | stateless sign-out (client discards session) |
+| `GET /api/health`                                   | –         | `{ status, authProvider: supabase\|local }`  |
 
 ---
 
@@ -212,4 +206,5 @@ Every API response includes the full breakdown; the UI renders four progress bar
 
 - `docs/DSA-ARCHITECTURE.md` — DSA architecture diagram + complexity tables
 - `docs/REPORT-STRUCTURE.md` — semester project report outline
+
 # R-sum-Job-Matching-Talent-Marketplace-Engine

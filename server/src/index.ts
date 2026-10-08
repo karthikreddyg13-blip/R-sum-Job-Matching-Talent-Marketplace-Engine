@@ -33,7 +33,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 
-app.get('/api/health', async (_req, res) => {
+const healthHandler = async (_req: express.Request, res: express.Response) => {
   // DB ping (json store: verify file readable & collections present)
   let database = 'ok';
   try {
@@ -56,7 +56,10 @@ app.get('/api/health', async (_req, res) => {
     service: 'talentmatch-api',
     time: new Date().toISOString(),
   });
-});
+};
+
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 app.use('/api/auth', authRoutes(store, supabase));
 app.use('/api/jobs', jobsRoutes(store, rec, auto, supabase));
